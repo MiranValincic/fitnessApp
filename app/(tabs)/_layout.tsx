@@ -1,33 +1,40 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import AntDesign from "@expo/vector-icons/AntDesign";
+import Feather from "@expo/vector-icons/Feather";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { Tabs } from "expo-router";
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
+export default function TabsLayout() {
+  const primaryColor = "#78A481";
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
+        headerStyle: { backgroundColor: primaryColor },
+        headerTitleAlign: "center",
+        headerShadowVisible: false,
+        tabBarStyle: { borderTopColor: primaryColor, borderTopWidth: 0, elevation: 0, shadowOpacity: 0 },
+        tabBarInactiveTintColor: primaryColor,
+        tabBarActiveTintColor: primaryColor,
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: "4-Weeks Fitness Program",
+          tabBarIcon: ({ color }) => <Ionicons name="fitness" size={24} color={primaryColor} />,
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="profile"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: "Profile",
+          tabBarIcon: ({ size }) => <Feather name="user" size={24} color={primaryColor} />,
+        }}
+      />
+      <Tabs.Screen
+        name="aiVideos"
+        options={{
+          title: "AI Videos",
+          tabBarIcon: ({ size }) => <AntDesign name="open-ai" size={24} color={primaryColor} />,
         }}
       />
     </Tabs>
