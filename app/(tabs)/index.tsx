@@ -2,11 +2,43 @@ import { useAuth } from "@/lib/auth-context";
 import { Ionicons } from "@expo/vector-icons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
+import { Pedometer } from "expo-sensors";
+import { useEffect, useState } from "react";
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Avatar, Button, Card } from "react-native-paper";
 
 export default function Index() {
   const { signOut } = useAuth();
+  const [steps, setSteps] = useState(0);
+
+  useEffect(() => {
+    const getStepCount = async () => {
+      try {
+        const isAvailable = await Pedometer.isAvailableAsync();
+        if (!isAvailable) {
+          console.log("Pedometer is not available");
+          return;
+        }
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todaySteps = await Pedometer.getStepCountAsync(today, new Date());
+
+        setSteps(todaySteps.steps);
+      } catch (error) {
+        console.error("Error getting step count:", error);
+      }
+    };
+
+    getStepCount();
+
+    // Poll for step updates every 10 seconds
+    const interval = setInterval(getStepCount, 10000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
   return (
     <ScrollView style={styles.container}>
@@ -33,7 +65,7 @@ export default function Index() {
               <Text style={styles.metricLabel}>Today Activity Steps</Text>
             </View>
             <Text style={styles.metricValue}>
-              0 <Ionicons name="walk" size={20} color="#666" />
+              {steps} <Ionicons name="walk" size={20} color="#666" />
             </Text>
             <Text style={styles.metricTarget}>Goal: 10000</Text>
           </View>

@@ -12,7 +12,7 @@ function RouteGuard({ children }: { children: React.ReactNode }) {
     if (!user && !inAuthGroup) {
       // router.replace("/auth");
     } else if (user && inAuthGroup && !isLoadingUser) {
-      router.replace("/");
+      // router.replace("/");
     }
   }, [user, segments]);
 
@@ -25,6 +25,15 @@ export default function RootLayout() {
       <RouteGuard>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="VideoPlayer"
+            options={{
+              title: "Video Player",
+              headerStyle: { backgroundColor: "#78A481" },
+              headerTitleAlign: "center",
+              headerTintColor: "#fff",
+            }}
+          />
         </Stack>
       </RouteGuard>
     </AuthProvider>

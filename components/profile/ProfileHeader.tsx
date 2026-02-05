@@ -1,5 +1,5 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, View } from "react-native";
+import { Avatar } from "react-native-paper";
 
 type ProfileHeaderProps = {
   email?: string | null;
@@ -36,13 +36,13 @@ export default function ProfileHeader({ email }: ProfileHeaderProps) {
           width: 80,
           height: 80,
           borderRadius: 40,
-          backgroundColor: "#999",
+          backgroundColor: "#9aff9a",
           alignItems: "center",
           justifyContent: "center",
           marginBottom: 20,
         }}
       >
-        <MaterialCommunityIcons name="account" size={50} color="#fff" />
+        <Avatar.Image size={50} source={{ uri: "https://i.pravatar.cc/150?img=1" }} />
       </View>
     </View>
   );

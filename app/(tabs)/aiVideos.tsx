@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
-import Video from "react-native-video";
+import { Image, Pressable, ScrollView, Text, View } from "react-native";
 
+import { useNavigation } from "@react-navigation/native";
 import { connectToDatabase } from "../../lib/appwrite";
 
 export default function AiVideos() {
+  const navigation = useNavigation();
   const [documents, setDocuments] = useState<VideoDoc[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -18,7 +19,7 @@ export default function AiVideos() {
         const response = await connectToDatabase();
         if (isMounted) {
           const docs = Array.isArray(response?.documents) ? response.documents : [];
-          setDocuments(docs as VideoDoc[]);
+          setDocuments(docs as unknown as VideoDoc[]);
           setErrorMessage(null);
           setIsLoading(false);
         }
@@ -65,14 +66,34 @@ export default function AiVideos() {
             >
               <Text style={{ fontSize: 16, fontWeight: "600", marginBottom: 6 }}>{doc.title}</Text>
               <Text style={{ color: "#4a4a4a", marginBottom: 8 }}>{doc.description}</Text>
+              {/* {doc.url ? (
+                <Pressable
+                  onPress={() => setPlayingId((current) => (current === doc.$id ? null : doc.$id))}
+                  style={{ marginBottom: 10 }}
+                >
+                  <Video
+                    source={{ uri: doc.url }}
+                    paused={playingId !== doc.$id}
+                    resizeMode="cover"
+                    style={{ height: 200, borderRadius: 8, backgroundColor: "#111" }}
+                  />
+                </Pressable>
+              ) : (
+                <Image
+                  source={{ uri: doc.thumbnailUrl }}
+                  style={{ height: 200, borderRadius: 8, backgroundColor: "#111" }}
+                />
+                )} */}
               <Pressable
-                onPress={() => setPlayingId((current) => (current === doc.$id ? null : doc.$id))}
-                style={{ marginBottom: 10 }}
+                onPress={() =>
+                  (navigation as any).navigate("VideoPlayer", {
+                    videoUrl: doc.url,
+                    title: doc.title,
+                  })
+                }
               >
-                <Video
-                  source={{ uri: doc.url }}
-                  paused={playingId !== doc.$id}
-                  resizeMode="cover"
+                <Image
+                  source={{ uri: doc.thumbnailUrl }}
                   style={{ height: 200, borderRadius: 8, backgroundColor: "#111" }}
                 />
               </Pressable>
@@ -93,6 +114,7 @@ type VideoDoc = {
   uploadDate: string;
   viewCount: number;
   likeCount: number;
+  thumbnailUrl: string;
 };
 
 const formatDuration = (totalSeconds: number) => {
