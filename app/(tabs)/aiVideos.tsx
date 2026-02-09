@@ -4,7 +4,7 @@ import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { connectToDatabase } from "../../lib/appwrite";
 
-export default function AiVideos() {
+export default function AiVideos({ title }: { title: string }) {
   const navigation = useNavigation();
   const [documents, setDocuments] = useState<VideoDoc[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);

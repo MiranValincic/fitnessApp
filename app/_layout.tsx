@@ -11,13 +11,19 @@ function RouteGuard({ children }: { children: React.ReactNode }) {
 
   const segments = useSegments();
   useEffect(() => {
-    const inAuthGroup = segments[0] === "auth";
-    if (!user && !inAuthGroup) {
-      // router.replace("/auth");
-    } else if (user && inAuthGroup && !isLoadingUser) {
-      // router.replace("/");
+    if (isLoadingUser) {
+      return;
     }
-  }, [user, segments]);
+
+    const inAuthGroup = segments[0] === "auth";
+    const isPublicRoute = inAuthGroup || segments[0] === "Terms";
+
+    if (!user && !isPublicRoute) {
+      router.replace("/auth");
+    } else if (user && inAuthGroup) {
+      router.replace("/");
+    }
+  }, [user, segments, isLoadingUser, router]);
 
   return <>{children}</>;
 }
@@ -31,10 +37,11 @@ export default function RootLayout() {
             <RouteGuard>
               <Stack>
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="Terms" options={{ headerShown: false }} />
                 <Stack.Screen
                   name="VideoPlayer"
                   options={{
-                    title: "Video Player",
+                    headerShown: false,
                     headerStyle: { backgroundColor: "#78A481" },
                     headerTitleAlign: "center",
                     headerTintColor: "#fff",

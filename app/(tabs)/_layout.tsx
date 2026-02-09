@@ -37,6 +37,13 @@ export default function TabsLayout() {
           tabBarIcon: ({ size }) => <AntDesign name="open-ai" size={24} color={primaryColor} />,
         }}
       />
+      <Tabs.Screen
+        name="More"
+        options={{
+          title: "More",
+          tabBarIcon: ({ size }) => <Feather name="more-horizontal" size={24} color={primaryColor} />,
+        }}
+      />
     </Tabs>
   );
 }

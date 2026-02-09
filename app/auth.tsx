@@ -1,5 +1,5 @@
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import { Image, KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
@@ -98,14 +98,6 @@ export default function AuthScreen() {
             designed to fit your life.
           </Text>
 
-          <View style={styles.dotsRow}>
-            <View style={styles.dot} />
-            <View style={styles.dotActive} />
-            <View style={styles.dot} />
-            <View style={styles.dot} />
-            <View style={styles.dot} />
-          </View>
-
           <View style={styles.formCard}>
             <TextInput
               label="Email"
@@ -138,6 +130,10 @@ export default function AuthScreen() {
               </Text>
             </Text>
           </View>
+          <Text style={styles.legalText}>
+            By continuing, you agree to our <Link href="/Terms">Terms of Use</Link>. Your data is safe with us and will never
+            be shared without your consent.
+          </Text>
         </View>
       </LinearGradient>
     </KeyboardAvoidingView>
