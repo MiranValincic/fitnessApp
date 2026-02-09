@@ -23,7 +23,7 @@ export default function Profile() {
     editingStartWeight,
     setEditingStartWeight,
     startWeightInput,
-    setStartWeightInput,
+    handleStartWeightInputChange,
     handleSaveStartWeight,
     calculateBMR,
     calculateTDEE,
@@ -50,7 +50,7 @@ export default function Profile() {
             chartData={getWeightChartData()}
             editingStartWeight={editingStartWeight}
             startWeightInput={startWeightInput}
-            onStartWeightInputChange={setStartWeightInput}
+            onStartWeightInputChange={handleStartWeightInputChange}
             onEditStartWeight={() => setEditingStartWeight(true)}
             onSaveStartWeight={handleSaveStartWeight}
             onCancelEdit={() => setEditingStartWeight(false)}

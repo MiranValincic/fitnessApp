@@ -1,6 +1,6 @@
-import { Dispatch, SetStateAction } from "react";
-import { Text, View } from "react-native";
-import { Card, SegmentedButtons, TextInput } from "react-native-paper";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Button, Card, SegmentedButtons, TextInput } from "react-native-paper";
 
 type SettingsSectionProps = {
   gender: string | null;
@@ -15,6 +15,14 @@ type SettingsSectionProps = {
   setHeight: Dispatch<SetStateAction<number | null>>;
 };
 
+const ACTIVITY_LEVELS = [
+  { value: "Sedentary", label: "Sedentary" },
+  { value: "Lightly Active", label: "Lightly Active" },
+  { value: "Moderately Active", label: "Moderately Active" },
+  { value: "Very Active", label: "Very Active" },
+  { value: "Extremely Active", label: "Extremely Active" },
+];
+
 export default function SettingsSection({
   gender,
   setGender,
@@ -27,6 +35,16 @@ export default function SettingsSection({
   height,
   setHeight,
 }: SettingsSectionProps) {
+  const [weightInput, setWeightInput] = useState(weight !== null ? weight.toString() : "");
+  const [isEditingWeight, setIsEditingWeight] = useState(false);
+
+  useEffect(() => {
+    if (isEditingWeight) {
+      return;
+    }
+    setWeightInput(weight !== null ? weight.toString() : "");
+  }, [weight, isEditingWeight]);
+
   return (
     <View>
       <Text
@@ -77,17 +95,20 @@ export default function SettingsSection({
           >
             Activity Level
           </Text>
-          <SegmentedButtons
-            value={activityLevel || ""}
-            onValueChange={setActivityLevel}
-            buttons={[
-              { value: "Sedentary", label: "Sed" },
-              { value: "Lightly Active", label: "Light" },
-              { value: "Moderately Active", label: "Mod" },
-              { value: "Very Active", label: "Very" },
-              { value: "Extremely Active", label: "Ext" },
-            ]}
-          />
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.activityLevelScroll}>
+            {ACTIVITY_LEVELS.map((level) => (
+              <Button
+                key={level.value}
+                mode={activityLevel === level.value ? "contained" : "outlined"}
+                onPress={() => setActivityLevel(level.value)}
+                style={styles.activityLevelButton}
+                labelStyle={styles.activityLevelButtonLabel}
+                compact
+              >
+                {level.label}
+              </Button>
+            ))}
+          </ScrollView>
         </Card.Content>
       </Card>
 
@@ -105,6 +126,7 @@ export default function SettingsSection({
           </Text>
           <TextInput
             label="Years"
+            style={{ backgroundColor: "#fff", color: "#020202" }}
             value={age !== null ? age.toString() : ""}
             onChangeText={(text) => setAge(text ? parseInt(text) : null)}
             keyboardType="numeric"
@@ -127,10 +149,26 @@ export default function SettingsSection({
           </Text>
           <TextInput
             label="Kilograms"
-            value={weight !== null ? weight.toString() : ""}
-            onChangeText={(text) => setWeight(text ? parseInt(text) : null)}
-            keyboardType="numeric"
+            value={weightInput}
+            style={{ backgroundColor: "#fff", color: "#020202 !important" }}
+            onChangeText={(text) => {
+              const normalized = text.replace(",", ".");
+              if (normalized === "") {
+                setWeightInput("");
+                setWeight(null);
+                return;
+              }
+              if (!/^\d*(\.\d{0,2})?$/.test(normalized)) {
+                return;
+              }
+              setWeightInput(normalized);
+              const parsed = parseFloat(normalized);
+              setWeight(Number.isNaN(parsed) ? null : parsed);
+            }}
+            keyboardType="decimal-pad"
             mode="outlined"
+            onFocus={() => setIsEditingWeight(true)}
+            onBlur={() => setIsEditingWeight(false)}
           />
         </Card.Content>
       </Card>
@@ -149,6 +187,7 @@ export default function SettingsSection({
           </Text>
           <TextInput
             label="Centimeters"
+            style={{ backgroundColor: "#fff", color: "#020202 !important" }}
             value={height !== null ? height.toString() : ""}
             onChangeText={(text) => setHeight(text ? parseInt(text) : null)}
             keyboardType="numeric"
@@ -159,3 +198,18 @@ export default function SettingsSection({
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  activityLevelScroll: {
+    paddingVertical: 4,
+  },
+  activityLevelButton: {
+    marginRight: 8,
+    borderRadius: 999,
+    borderColor: "#78A481",
+  },
+  activityLevelButtonLabel: {
+    fontSize: 12,
+    textTransform: "none",
+  },
+});

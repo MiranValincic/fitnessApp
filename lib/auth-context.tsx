@@ -7,12 +7,14 @@ type AuthContextType = {
   singUp: (email: string, password: string) => Promise<string | null>;
   logIn: (email: string, password: string) => Promise<string | null>;
   signOut?: () => Promise<void>;
+  error: string | null;
 };
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<Models.User<Models.Preferences> | null>(null);
   const [isLoadingUser, setIsLoadingUser] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     getUser();
@@ -23,6 +25,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const session = await account.get();
       setUser(session);
     } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("An unknown error occurred.");
+      }
       setUser(null);
     } finally {
       setIsLoadingUser(false);
@@ -35,8 +42,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return null;
     } catch (error) {
       if (error instanceof Error) {
+        setError(error.message);
         return error.message;
       }
+      setError("An unknown error occurred.");
       return "An unknown error occurred.";
     }
   };
@@ -48,8 +57,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return null;
     } catch (error) {
       if (error instanceof Error) {
+        setError(error.message);
         return error.message;
       }
+      setError("An unknown error occurred.");
       return "An unknown error occurred.";
     }
   };
@@ -63,7 +74,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  return <AuthContext.Provider value={{ user, isLoadingUser, singUp, logIn, signOut }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, isLoadingUser, singUp, logIn, signOut, error }}>{children}</AuthContext.Provider>
+  );
 }
 
 export function useAuth() {

@@ -138,8 +138,6 @@ export default function AuthScreen() {
               </Text>
             </Text>
           </View>
-
-          <Text style={styles.legalText}>Terms of use · Privacy policy</Text>
         </View>
       </LinearGradient>
     </KeyboardAvoidingView>

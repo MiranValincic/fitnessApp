@@ -4,39 +4,71 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Pedometer } from "expo-sensors";
 import { useEffect, useState } from "react";
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Avatar, Button, Card } from "react-native-paper";
 
 export default function Index() {
   const { signOut } = useAuth();
   const [steps, setSteps] = useState(0);
+  const [pedometerAvailable, setPedometerAvailable] = useState<boolean | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  const formatTime = (date: Date | null) => {
+    if (!date) {
+      return "never";
+    }
+
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  };
 
   useEffect(() => {
-    const getStepCount = async () => {
+    let subscription: { remove: () => void } | null = null;
+    let isMounted = true;
+
+    const startStepTracking = async () => {
       try {
         const isAvailable = await Pedometer.isAvailableAsync();
+        setPedometerAvailable(isAvailable);
         if (!isAvailable) {
           console.log("Pedometer is not available");
+          return;
+        }
+
+        if (Platform.OS === "android") {
+          subscription = Pedometer.watchStepCount((result) => {
+            if (isMounted) {
+              setSteps(result.steps);
+              setLastUpdated(new Date());
+            }
+          });
           return;
         }
 
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const todaySteps = await Pedometer.getStepCountAsync(today, new Date());
+        if (isMounted) {
+          setSteps(todaySteps.steps);
+          setLastUpdated(new Date());
+        }
 
-        setSteps(todaySteps.steps);
+        subscription = Pedometer.watchStepCount((result) => {
+          if (isMounted) {
+            setSteps(result.steps);
+            setLastUpdated(new Date());
+          }
+        });
       } catch (error) {
+        setPedometerAvailable(false);
         console.error("Error getting step count:", error);
       }
     };
 
-    getStepCount();
-
-    // Poll for step updates every 10 seconds
-    const interval = setInterval(getStepCount, 10000);
+    startStepTracking();
 
     return () => {
-      clearInterval(interval);
+      isMounted = false;
+      subscription?.remove();
     };
   }, []);
 
@@ -315,6 +347,11 @@ const styles = StyleSheet.create({
   metricTarget: {
     fontSize: 11,
     color: "#999",
+  },
+  metricStatus: {
+    marginTop: 4,
+    fontSize: 11,
+    color: "#7a7a7a",
   },
   section: {
     padding: 15,

@@ -36,7 +36,6 @@ export default function ProfileHeader({ email }: ProfileHeaderProps) {
           width: 80,
           height: 80,
           borderRadius: 40,
-          backgroundColor: "#9aff9a",
           alignItems: "center",
           justifyContent: "center",
           marginBottom: 20,

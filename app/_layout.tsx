@@ -1,5 +1,8 @@
 import { Stack, useRouter, useSegments } from "expo-router";
 import { useEffect } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { PaperProvider } from "react-native-paper";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider, useAuth } from "../lib/auth-context";
 
 function RouteGuard({ children }: { children: React.ReactNode }) {
@@ -21,21 +24,27 @@ function RouteGuard({ children }: { children: React.ReactNode }) {
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <RouteGuard>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="VideoPlayer"
-            options={{
-              title: "Video Player",
-              headerStyle: { backgroundColor: "#78A481" },
-              headerTitleAlign: "center",
-              headerTintColor: "#fff",
-            }}
-          />
-        </Stack>
-      </RouteGuard>
-    </AuthProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <AuthProvider>
+        <PaperProvider>
+          <SafeAreaProvider>
+            <RouteGuard>
+              <Stack>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="VideoPlayer"
+                  options={{
+                    title: "Video Player",
+                    headerStyle: { backgroundColor: "#78A481" },
+                    headerTitleAlign: "center",
+                    headerTintColor: "#fff",
+                  }}
+                />
+              </Stack>
+            </RouteGuard>
+          </SafeAreaProvider>
+        </PaperProvider>
+      </AuthProvider>
+    </GestureHandlerRootView>
   );
 }

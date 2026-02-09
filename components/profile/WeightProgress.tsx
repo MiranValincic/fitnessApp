@@ -72,7 +72,7 @@ export default function WeightProgress({
                   const barHeight = 40 + ((entry.weight - chartData.min) / chartData.range) * 80;
                   return (
                     <View key={`${entry.date}-${index}`} style={{ width: 60, alignItems: "center" }}>
-                      <Text style={{ fontSize: 10, color: "#78a481", marginBottom: 6 }}>{entry.weight.toFixed(1)}</Text>
+                      <Text style={{ fontSize: 10, color: "#78a481", marginBottom: 6 }}>{entry.weight.toFixed(2)}</Text>
                       <View
                         style={{
                           height: 120,
@@ -121,7 +121,7 @@ export default function WeightProgress({
                   <TextInput
                     value={startWeightInput}
                     onChangeText={onStartWeightInputChange}
-                    keyboardType="numeric"
+                    keyboardType="decimal-pad"
                     style={{ flex: 1, minHeight: 30 }}
                     mode="outlined"
                   />
@@ -150,7 +150,7 @@ export default function WeightProgress({
                 </View>
               ) : (
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginTop: 4 }}>
-                  <Text style={{ fontSize: 14, fontWeight: "bold", color: "#333" }}>{startingWeight} kg</Text>
+                  <Text style={{ fontSize: 14, fontWeight: "bold", color: "#333" }}>{startingWeight.toFixed(2)} kg</Text>
                   <Text
                     onPress={onEditStartWeight}
                     style={{
@@ -166,7 +166,9 @@ export default function WeightProgress({
             </View>
             <View style={{ flex: 1 }}>
               <Text style={{ fontSize: 11, color: "#999", fontWeight: "600" }}>Current Weight</Text>
-              <Text style={{ fontSize: 14, fontWeight: "bold", color: "#333", marginTop: 4 }}>{currentWeight} kg</Text>
+              <Text style={{ fontSize: 14, fontWeight: "bold", color: "#333", marginTop: 4 }}>
+                {currentWeight.toFixed(2)} kg
+              </Text>
             </View>
             <View style={{ flex: 1 }}>
               <Text style={{ fontSize: 11, color: "#999", fontWeight: "600" }}>Progress</Text>
@@ -179,7 +181,7 @@ export default function WeightProgress({
                 }}
               >
                 {progress < 0 ? "" : "+"}
-                {progress.toFixed(1)} kg
+                {progress.toFixed(2)} kg
               </Text>
             </View>
           </View>

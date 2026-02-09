@@ -10,7 +10,7 @@ export const databases = new Databases(client);
 
 // Database connection
 const DATABASE_ID = process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID!;
-const VIDEOS_COLLECTION_ID = "videos";
+const VIDEOS_COLLECTION_ID = process.env.EXPO_PUBLIC_APPWRITE_COLLECTION_ID!;
 export const connectToDatabase = async () => {
   try {
     const response = await databases.listDocuments(DATABASE_ID, VIDEOS_COLLECTION_ID);

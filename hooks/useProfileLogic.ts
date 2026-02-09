@@ -1,5 +1,6 @@
 import { addWeightEntry, getWeightHistory, updateStartingWeight, updateUserPreferences } from "@/lib/appwrite";
 import { useAuth } from "@/lib/auth-context";
+import type { UserProfile } from "@/types/appwrite";
 import { useEffect, useState } from "react";
 
 type WeightEntry = { weight: number; date: string };
@@ -12,6 +13,7 @@ type WeightChartData = {
 
 export default function useProfileLogic() {
   const { user } = useAuth();
+  const prefs = user?.prefs as UserProfile | undefined;
   const [age, setAge] = useState<number | null>(null);
   const [weight, setWeight] = useState<number | null>(null);
   const [height, setHeight] = useState<number | null>(null);
@@ -23,23 +25,23 @@ export default function useProfileLogic() {
   const [startWeightInput, setStartWeightInput] = useState<string>("");
 
   useEffect(() => {
-    if (user?.prefs?.age) {
-      setAge(user.prefs.age);
+    if (prefs?.age) {
+      setAge(prefs.age);
     }
-    if (user?.prefs?.weight) {
-      setWeight(user.prefs.weight);
+    if (prefs?.weight) {
+      setWeight(prefs.weight);
     }
-    if (user?.prefs?.height) {
-      setHeight(user.prefs.height);
+    if (prefs?.height) {
+      setHeight(prefs.height);
     }
-    if (user?.prefs?.gender) {
-      setGender(user.prefs.gender);
+    if (prefs?.gender) {
+      setGender(prefs.gender);
     }
-    if (user?.prefs?.activityLevel) {
-      setActivityLevel(user.prefs.activityLevel);
+    if (prefs?.activityLevel) {
+      setActivityLevel(prefs.activityLevel);
     }
     loadWeightHistory();
-  }, [user]);
+  }, [prefs, user]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -124,13 +126,27 @@ export default function useProfileLogic() {
   const handleSaveStartWeight = async () => {
     if (startWeightInput && parseFloat(startWeightInput) > 0) {
       try {
-        await updateStartingWeight(parseFloat(startWeightInput));
+        const parsed = parseFloat(startWeightInput);
+        const rounded = Math.round(parsed * 100) / 100;
+        await updateStartingWeight(rounded);
         await loadWeightHistory();
         setEditingStartWeight(false);
       } catch (error) {
         console.error("Failed to update starting weight:", error);
       }
     }
+  };
+
+  const handleStartWeightInputChange = (text: string) => {
+    const normalized = text.replace(",", ".");
+    if (normalized === "") {
+      setStartWeightInput("");
+      return;
+    }
+    if (!/^\d*(\.\d{0,2})?$/.test(normalized)) {
+      return;
+    }
+    setStartWeightInput(normalized);
   };
 
   const pushHeight = async () => {
@@ -248,6 +264,7 @@ export default function useProfileLogic() {
     setEditingStartWeight,
     startWeightInput,
     setStartWeightInput,
+    handleStartWeightInputChange,
     handleSaveStartWeight,
     calculateBMR,
     calculateTDEE,
